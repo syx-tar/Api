@@ -86,7 +86,7 @@ npm run db:seed
 
 ### 5. Run Development Server
 \`\`\`bash
-npm run dev
+npm run dev -- --host
 \`\`\`
 
 Visit [http://localhost:3000](http://localhost:3000) to see your blog!
