@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puppeteer Browser Streaming</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🌐 Remote Browser</h1>
+            <div class="controls">
+                <button id="backBtn" class="btn">← Back</button>
+                <button id="forwardBtn" class="btn">Forward →</button>
+                <button id="refreshBtn" class="btn">🔄 Refresh</button>
+                <input type="url" id="urlInput" placeholder="Enter URL..." class="url-input">
+                <button id="goBtn" class="btn btn-primary">Go</button>
+            </div>
+        </header>
+        
+        <div class="browser-container">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Connecting to browser...</p>
+            </div>
+            
+            <div class="browser-screen" id="browserScreen" style="display: none;">
+                <img id="screenshot" src="" alt="Browser Screenshot">
+                <div class="overlay" id="overlay"></div>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <span id="status">Disconnected</span>
+            <span id="fps">FPS: 0</span>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
