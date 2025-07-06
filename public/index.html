@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puppeteer Browser Streaming</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🌐 Remote Browser Streaming</h1>
+            <div class="controls">
+                <button id="backBtn" class="btn" title="Go back">← Back</button>
+                <button id="forwardBtn" class="btn" title="Go forward">Forward →</button>
+                <button id="refreshBtn" class="btn" title="Refresh page">🔄 Refresh</button>
+                <input type="url" id="urlInput" placeholder="Enter URL (e.g., google.com)" class="url-input" title="Enter website URL">
+                <button id="goBtn" class="btn btn-primary" title="Navigate to URL">Go</button>
+            </div>
+        </header>
+        
+        <div class="browser-container">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Connecting to browser...</p>
+                <p class="connection-info">Initializing remote session</p>
+            </div>
+            
+            <div class="browser-screen" id="browserScreen" style="display: none;">
+                <img id="screenshot" src="" alt="Browser Screenshot" draggable="false">
+                <div class="overlay" id="overlay"></div>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <div class="left">
+                <span id="status">Disconnected</span>
+                <span id="fps">FPS: 0</span>
+            </div>
+            <div class="right">
+                <span id="connectionInfo" class="connection-info">Connecting...</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Display connection info in status bar
+        document.addEventListener('DOMContentLoaded', function() {
+            const connectionInfo = document.getElementById('connectionInfo');
+            
+            // Show current URL info
+            function updateConnectionInfo() {
+                const protocol = window.location.protocol;
+                const host = window.location.host;
+                const isSecure = protocol === 'https:';
+                
+                connectionInfo.textContent = `${protocol}//${host} ${isSecure ? '🔒' : '🔓'}`;
+                connectionInfo.title = `Connection: ${protocol}//${host}\nSecure: ${isSecure ? 'Yes' : 'No'}`;
+            }
+            
+            updateConnectionInfo();
+            
+            // Update on visibility change
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    updateConnectionInfo();
+                }
+            });
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'r':
+                        e.preventDefault();
+                        document.getElementById('refreshBtn').click();
+                        break;
+                    case 'l':
+                        e.preventDefault();
+                        document.getElementById('urlInput').focus();
+                        document.getElementById('urlInput').select();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
