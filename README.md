@@ -1,6 +1,6 @@
 # 🌐 Browser Streaming dengan Puppeteer
 
-Aplikasi web yang memungkinkan Anda mengendalikan browser secara remote melalui streaming real-time menggunakan Puppeteer dan Socket.IO.
+Aplikasi web yang memungkinkan Anda mengendalikan browser secara remote melalui streaming real-time menggunakan Puppeteer dan Socket.IO. **Sekarang mendukung akses melalui Public IP!**
 
 ## ✨ Fitur
 
@@ -9,6 +9,8 @@ Aplikasi web yang memungkinkan Anda mengendalikan browser secara remote melalui 
 - **Interaksi Lengkap**: Klik, ketik, scroll, dan navigasi
 - **Interface Modern**: UI yang responsif dan user-friendly
 - **WebSocket**: Komunikasi real-time menggunakan Socket.IO
+- **🌍 Public IP Support**: Akses dari mana saja melalui internet
+- **Environment Variables**: Konfigurasi yang fleksibel
 
 ## 🚀 Instalasi
 
@@ -17,6 +19,7 @@ Aplikasi web yang memungkinkan Anda mengendalikan browser secara remote melalui 
 - Node.js (versi 14 atau lebih baru)
 - npm atau yarn
 - Browser modern (Chrome, Firefox, Safari, Edge)
+- **Port terbuka** (default: 3000) jika menggunakan public IP
 
 ### Langkah Instalasi
 
@@ -31,7 +34,13 @@ Aplikasi web yang memungkinkan Anda mengendalikan browser secara remote melalui 
    npm install
    ```
 
-3. **Jalankan aplikasi**
+3. **Konfigurasi Environment (Opsional)**
+   ```bash
+   cp .env.example .env
+   # Edit .env sesuai kebutuhan
+   ```
+
+4. **Jalankan aplikasi**
    ```bash
    npm start
    ```
@@ -41,139 +50,286 @@ Aplikasi web yang memungkinkan Anda mengendalikan browser secara remote melalui 
    npm run dev
    ```
 
-4. **Buka browser dan akses**
-   ```
-   http://localhost:3000
-   ```
-
 ## 📖 Cara Penggunaan
 
-### 1. Memulai Aplikasi
+### 1. Akses Lokal
+```
+http://localhost:3000
+```
 
-Setelah menjalankan `npm start`, aplikasi akan:
-- Menjalankan server Express pada port 3000
-- Membuka browser Puppeteer secara otomatis
-- Menampilkan Google sebagai halaman awal
+### 2. Akses melalui LAN/Network
+```
+http://[IP-LOCAL]:3000
+```
 
-### 2. Menggunakan Interface
+### 3. Akses melalui Public IP
+```
+http://[PUBLIC-IP]:3000
+```
 
-#### **Navigasi**
-- **URL Input**: Masukkan URL dan klik "Go" atau tekan Enter
-- **Back Button**: Kembali ke halaman sebelumnya
-- **Forward Button**: Maju ke halaman selanjutnya
-- **Refresh Button**: Refresh halaman saat ini
+Server akan otomatis menampilkan semua URL yang tersedia saat startup:
+```
+🚀 Server started successfully!
+📍 Server running on http://0.0.0.0:3000
 
-#### **Interaksi dengan Browser**
-- **Klik**: Klik pada screenshot untuk berinteraksi dengan halaman
-- **Scroll**: Gunakan mouse wheel pada screenshot untuk scroll
-- **Ketik**: Tekan tombol pada keyboard untuk mengetik
-- **Shortcut**: Gunakan keyboard shortcut seperti Enter, Backspace, dll.
+🌐 Access URLs:
+   Local:    http://localhost:3000
+   Network:  http://192.168.1.100:3000 (eth0)
+   Network:  http://10.0.0.50:3000 (wlan0)
+```
 
-#### **Status Monitoring**
-- **Status**: Menampilkan status koneksi (Connected/Disconnected)
-- **FPS**: Menampilkan framerate streaming real-time
+## 🌍 Konfigurasi Public IP
 
-### 3. Fitur-fitur Khusus
+### Method 1: Environment Variables
+```bash
+# Set environment variables
+export HOST=0.0.0.0
+export PORT=3000
+export HEADLESS=false
+export FPS=10
+export QUALITY=60
 
-- **Visual Feedback**: Efek visual saat melakukan klik
-- **Notifikasi**: Popup notifikasi untuk feedback aksi
-- **Responsive**: Interface yang responsive untuk berbagai ukuran layar
-- **Loading State**: Indikator loading saat menghubungkan ke browser
+npm start
+```
 
-## 🔧 Konfigurasi
+### Method 2: File .env
+```bash
+# Copy dan edit file .env
+cp .env.example .env
+```
+
+Edit file `.env`:
+```env
+# Server Configuration
+PORT=3000
+HOST=0.0.0.0
+
+# Browser Configuration
+HEADLESS=false
+FPS=10
+QUALITY=60
+```
+
+### Method 3: Direct Command
+```bash
+# Linux/Mac
+HOST=0.0.0.0 PORT=3000 npm start
+
+# Windows
+set HOST=0.0.0.0 && set PORT=3000 && npm start
+```
+
+## 🔧 Konfigurasi Lanjutan
+
+### Environment Variables
+
+| Variable | Default | Deskripsi |
+|----------|---------|-----------|
+| `HOST` | `0.0.0.0` | IP untuk bind server |
+| `PORT` | `3000` | Port server |
+| `HEADLESS` | `false` | Jalankan browser tanpa GUI |
+| `FPS` | `10` | Framerate streaming |
+| `QUALITY` | `60` | Kualitas JPEG (1-100) |
 
 ### Mengubah Port
-
-Edit file `server.js` baris terakhir:
-```javascript
-const PORT = process.env.PORT || 3000; // Ubah 3000 ke port yang diinginkan
+```bash
+PORT=8080 npm start
 ```
 
 ### Mengubah Kualitas Streaming
-
-Edit file `server.js` pada bagian screenshot:
-```javascript
-const screenshot = await page.screenshot({
-  type: 'jpeg',
-  quality: 60, // Ubah 60 ke nilai 1-100 untuk kualitas
-  fullPage: false
-});
+```bash
+QUALITY=30 npm start  # Kualitas rendah, bandwidth rendah
+QUALITY=90 npm start  # Kualitas tinggi, bandwidth tinggi
 ```
 
 ### Mengubah Framerate
+```bash
+FPS=5 npm start   # 5 FPS - hemat bandwidth
+FPS=15 npm start  # 15 FPS - lebih smooth
+```
 
-Edit file `server.js` pada bagian streaming interval:
-```javascript
-}, 100); // Ubah 100 ke nilai ms yang diinginkan (100ms = 10 FPS)
+### Mode Headless (untuk Server)
+```bash
+HEADLESS=true npm start
+```
+
+## 🛡️ Keamanan untuk Public IP
+
+> **⚠️ PERINGATAN**: Menggunakan public IP membuka akses ke semua orang di internet!
+
+### Rekomendasi Keamanan
+
+1. **Gunakan Firewall**
+   ```bash
+   # Ubuntu/Debian
+   sudo ufw allow 3000/tcp
+   sudo ufw enable
+   
+   # CentOS/RHEL
+   sudo firewall-cmd --add-port=3000/tcp --permanent
+   sudo firewall-cmd --reload
+   ```
+
+2. **Gunakan Reverse Proxy (Nginx)**
+   ```nginx
+   server {
+       listen 80;
+       server_name yourdomain.com;
+       
+       location / {
+           proxy_pass http://localhost:3000;
+           proxy_http_version 1.1;
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection 'upgrade';
+           proxy_set_header Host $host;
+           proxy_cache_bypass $http_upgrade;
+       }
+   }
+   ```
+
+3. **Gunakan HTTPS dengan SSL**
+   ```bash
+   # Install Certbot
+   sudo apt install certbot python3-certbot-nginx
+   
+   # Generate SSL certificate
+   sudo certbot --nginx -d yourdomain.com
+   ```
+
+4. **Batasi IP Access**
+   ```bash
+   # Allow specific IP only
+   sudo ufw allow from 192.168.1.0/24 to any port 3000
+   ```
+
+## �️ Deployment di VPS/Cloud
+
+### 1. AWS EC2
+```bash
+# Security Group: Allow port 3000
+# Instance: t2.micro atau lebih besar
+
+# Install Node.js
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Clone and setup
+git clone <repo-url>
+cd puppeteer-browser-streaming
+npm install
+
+# Install Chrome dependencies
+sudo apt-get install -y gconf-service libasound2-dev libatk1.0-dev libc6-dev libcairo2-dev libcups2-dev libdbus-1-dev libexpat1-dev libfontconfig1-dev libgcc1 libgconf-2-4 libgdk-pixbuf2.0-dev libglib2.0-dev libgtk-3-dev libnspr4-dev libpango-1.0-dev libpangocairo-1.0-dev libstdc++6 libx11-dev libx11-xcb1 libxcb1-dev libxcomposite1-dev libxcursor1-dev libxdamage1-dev libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
+
+# Run with PM2
+npm install -g pm2
+pm2 start server.js --name browser-streaming
+pm2 startup
+pm2 save
+```
+
+### 2. Google Cloud Platform
+```bash
+# Compute Engine instance
+# Allow HTTP traffic
+
+# Same setup as AWS
+```
+
+### 3. DigitalOcean
+```bash
+# Droplet dengan Ubuntu
+# Firewall: Allow port 3000
+
+# Setup sama seperti AWS
 ```
 
 ## 🛠️ Troubleshooting
 
-### Browser Tidak Muncul
+### Port Sudah Digunakan
+```bash
+# Cari process yang menggunakan port
+lsof -i :3000
 
-**Masalah**: Browser Puppeteer tidak terbuka
-**Solusi**: 
-- Pastikan sistem memiliki Chrome/Chromium terinstall
-- Jalankan dengan headless mode jika tidak ada display:
-  ```javascript
-  headless: true, // Ubah ke true di server.js
-  ```
+# Kill process
+kill -9 <PID>
 
-### Koneksi Terputus
+# Atau gunakan port lain
+PORT=8080 npm start
+```
 
-**Masalah**: Status menunjukkan "Disconnected"
-**Solusi**:
-- Refresh halaman web
-- Restart server dengan `npm start`
-- Periksa console untuk error
+### Browser Tidak Muncul di Server
+```bash
+# Gunakan headless mode
+HEADLESS=true npm start
+```
 
-### Performa Lambat
+### Connection Timeout
+```bash
+# Check firewall
+sudo ufw status
 
-**Masalah**: Streaming lag atau lambat
-**Solusi**:
-- Turunkan kualitas screenshot (quality: 30-50)
-- Perbesar interval streaming (200-500ms)
-- Gunakan resolusi browser yang lebih kecil
+# Check port listening
+netstat -tlnp | grep :3000
+```
 
-### Error saat Install
+### Puppeteer Chrome Error
+```bash
+# Install dependencies
+sudo apt-get install -y gconf-service libasound2-dev libatk1.0-dev libc6-dev libcairo2-dev libcups2-dev libdbus-1-dev libexpat1-dev libfontconfig1-dev libgcc1 libgconf-2-4 libgdk-pixbuf2.0-dev libglib2.0-dev libgtk-3-dev libnspr4-dev libpango-1.0-dev libpangocairo-1.0-dev libstdc++6 libx11-dev libx11-xcb1 libxcb1-dev libxcomposite1-dev libxcursor1-dev libxdamage1-dev libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
+```
 
-**Masalah**: `npm install` gagal
-**Solusi**:
-- Hapus folder `node_modules` dan `package-lock.json`
-- Jalankan `npm install` lagi
-- Pastikan Node.js versi terbaru
+## 📝 Fitur Baru (Public IP)
 
-## 📝 Arsitektur Teknis
+### 1. Connection Status
+- Real-time connection indicator
+- Connection URL display
+- Automatic reconnection
 
-### Backend (server.js)
-- **Express.js**: Web server framework
-- **Socket.IO**: Real-time communication
-- **Puppeteer**: Browser automation
-- **CORS**: Cross-origin resource sharing
+### 2. Environment Configuration
+- Flexible port and host settings
+- Quality and performance tuning
+- Headless mode for servers
 
-### Frontend (public/)
-- **HTML5**: Struktur halaman
-- **CSS3**: Styling dan animasi
-- **JavaScript ES6+**: Logika aplikasi
-- **Socket.IO Client**: Komunikasi real-time
+### 3. Enhanced UI
+- Better responsive design
+- Connection info display
+- Improved notifications
 
-### Flow Data
-1. Server menjalankan Puppeteer browser
-2. Screenshot diambil setiap 100ms
-3. Screenshot diencode ke base64
-4. Data dikirim ke client via WebSocket
-5. Client menampilkan screenshot
-6. Input user dikirim balik ke server
-7. Server mengeksekusi input di browser
+### 4. Health Check
+```
+GET http://your-server:3000/health
+```
 
-## 🔒 Keamanan
+### 5. Keyboard Shortcuts
+- `Ctrl+R` / `Cmd+R`: Refresh browser
+- `Ctrl+L` / `Cmd+L`: Focus URL input
 
-**Peringatan**: Aplikasi ini menjalankan browser dengan akses penuh. Untuk penggunaan production:
+## 🔗 Contoh Penggunaan
 
-- Implementasikan authentication
-- Batasi akses URL tertentu
-- Jalankan dalam container/sandbox
-- Batasi jumlah concurrent connections
+### Lokal Development
+```bash
+npm start
+# Access: http://localhost:3000
+```
+
+### Team Sharing (LAN)
+```bash
+HOST=0.0.0.0 npm start
+# Access: http://[your-ip]:3000
+```
+
+### Public Demo
+```bash
+# Di VPS dengan public IP
+HOST=0.0.0.0 PORT=3000 npm start
+# Access: http://[public-ip]:3000
+```
+
+### Production dengan PM2
+```bash
+pm2 start ecosystem.config.js
+```
 
 ## 📦 Dependencies
 
@@ -181,6 +337,7 @@ Edit file `server.js` pada bagian streaming interval:
 - `puppeteer`: Browser automation
 - `socket.io`: Real-time communication
 - `cors`: Cross-origin support
+- `os`: Network interface detection
 
 ## 🤝 Kontribusi
 
@@ -196,4 +353,4 @@ Jika mengalami masalah atau memiliki pertanyaan, silakan buat issue di repositor
 
 ---
 
-**Selamat menggunakan Browser Streaming dengan Puppeteer! 🎉**
+**🌍 Sekarang Anda dapat mengakses browser streaming dari mana saja di dunia! 🎉**

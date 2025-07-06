@@ -47,18 +47,48 @@ class BrowserStreaming {
     }
     
     connect() {
-        this.socket = io();
+        // Dynamic server URL detection untuk public IP support
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = window.location.host;
+        
+        // Socket.IO akan otomatis detect URL jika tidak dispesifikasikan
+        this.socket = io({
+            transports: ['websocket', 'polling'],
+            timeout: 20000,
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            maxReconnectionAttempts: 5
+        });
         
         this.socket.on('connect', () => {
             this.connected = true;
             this.updateStatus('Connected');
             this.hideLoading();
+            this.showNotification('Connected to server', 'success');
+            console.log('🔗 Connected to server');
         });
         
-        this.socket.on('disconnect', () => {
+        this.socket.on('disconnect', (reason) => {
             this.connected = false;
             this.updateStatus('Disconnected');
             this.showLoading();
+            this.showNotification(`Disconnected: ${reason}`, 'error');
+            console.log('❌ Disconnected from server:', reason);
+        });
+        
+        this.socket.on('connect_error', (error) => {
+            console.error('❌ Connection error:', error);
+            this.showNotification('Connection failed', 'error');
+        });
+        
+        this.socket.on('reconnect', (attemptNumber) => {
+            console.log('🔄 Reconnected after', attemptNumber, 'attempts');
+            this.showNotification('Reconnected to server', 'success');
+        });
+        
+        this.socket.on('reconnect_error', (error) => {
+            console.error('❌ Reconnection error:', error);
         });
         
         this.socket.on('screenshot', (base64Image) => {
@@ -89,7 +119,7 @@ class BrowserStreaming {
     
     updateStatus(status) {
         this.status.textContent = status;
-        this.status.className = status.toLowerCase();
+        this.status.className = status.toLowerCase().replace(' ', '-');
     }
     
     showLoading() {
@@ -182,6 +212,14 @@ class BrowserStreaming {
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
         notification.textContent = message;
+        
+        const colors = {
+            'info': '#4a9eff',
+            'success': '#4caf50',
+            'error': '#f44336',
+            'warning': '#ff9800'
+        };
+        
         notification.style.cssText = `
             position: fixed;
             top: 20px;
@@ -194,7 +232,10 @@ class BrowserStreaming {
             opacity: 0;
             transform: translateX(100px);
             transition: all 0.3s ease;
-            ${type === 'error' ? 'background: #f44336;' : 'background: #4a9eff;'}
+            background: ${colors[type] || colors.info};
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            max-width: 300px;
+            word-wrap: break-word;
         `;
         
         document.body.appendChild(notification);
@@ -212,9 +253,31 @@ class BrowserStreaming {
             setTimeout(() => notification.remove(), 300);
         }, 3000);
     }
+    
+    // Method untuk menampilkan informasi koneksi
+    showConnectionInfo() {
+        const info = {
+            url: window.location.href,
+            protocol: window.location.protocol,
+            host: window.location.host,
+            userAgent: navigator.userAgent,
+            connected: this.connected
+        };
+        
+        console.log('🔗 Connection Info:', info);
+        return info;
+    }
 }
 
 // Initialize the browser streaming when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    new BrowserStreaming();
+    const browserStreaming = new BrowserStreaming();
+    
+    // Expose to global scope untuk debugging
+    window.browserStreaming = browserStreaming;
+    
+    // Show connection info
+    setTimeout(() => {
+        browserStreaming.showConnectionInfo();
+    }, 1000);
 });
